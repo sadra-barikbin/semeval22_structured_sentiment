@@ -29,10 +29,10 @@ for DATASET in darmstadt_unis mpqa multibooked_ca multibooked_eu norec opener_es
 
     # Train extraction models
     for ANNOTATION in sources targets expressions; do
-        python3 extraction_module.py -data "$DATASET" -emb "$EXTERNAL" -ann "$ANNOTATION"
+        python3 extraction_module.py --DEVICE cuda --DEVDATA -bs 128 -data "$DATASET" -emb "$EXTERNAL" -ann "$ANNOTATION"
     done;
 
     # Train relation prediction model
-    python3 relation_prediction_module.py -data "$DATASET" -emb "$EXTERNAL"
+    python3 relation_prediction_module.py --DEVICE cuda --DEVDATA -bs 128 -data "$DATASET" -emb "$EXTERNAL"
 
 done;

@@ -2,6 +2,7 @@ import torch
 from collections import defaultdict
 import torch.nn as nn
 import torch.nn.functional as F
+from functools import partial
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence, PackedSequence
 from torch.nn.utils.rnn import pack_sequence
 from torch.utils.data.dataloader import default_collate
@@ -193,8 +194,8 @@ class Relation_Model(nn.Module):
             batches += 1
             batch_sizes = sent.batch_sizes
             pred = self.forward(sent, e1, e2, batch_sizes)
-            preds.extend(pred)
-            golds.extend(label)
+            preds.extend(pred.cpu().numpy())
+            golds.extend(label.cpu().numpy())
             loss = self.criterion(pred, label.float())
             batch_loss += loss.data
         pred_labels = [1 if i > .5 else 0 for i in preds]
@@ -239,6 +240,7 @@ if __name__ == "__main__":
     parser.add_argument("--POOLING", default="max", help="max or mean (default is max)")
     parser.add_argument("--LEARNING_RATE", default=0.001, type=float)
     parser.add_argument("--save_all", action="store_true", help="if true, saves all models, otherwise, saves only best model")
+    parser.add_argument("--DEVICE", "-device", default='cpu')
 
     args = parser.parse_args()
     print(args)
@@ -293,17 +295,18 @@ if __name__ == "__main__":
                                embedding_dim=emb_dim,
                                hidden_dim=args.HIDDEN_DIM,
                                embedding_matrix=new_matrix,
-                               pooling=args.POOLING)
+                               pooling=args.POOLING).to(args.DEVICE)
 
+    collate_fn = partial(train.collate_fn, device=args.DEVICE)
 
     train_loader = DataLoader(train,
                               batch_size=20,
-                              collate_fn=train.collate_fn,
+                              collate_fn=collate_fn,
                               shuffle=True)
 
     dev_loader = DataLoader(dev,
                             batch_size=20,
-                            collate_fn=train.collate_fn,
+                            collate_fn=collate_fn,
                             shuffle=False)
 
     # Save the model parameters
@@ -333,6 +336,7 @@ if __name__ == "__main__":
                                                   "relation_prediction",
                                                   "{0}".format(args.DATADIR)))
     rel_model.load_state_dict(torch.load(best_model))
+    rel_model.to(args.DEVICE)
 
     vocab.update_idx2w()
 

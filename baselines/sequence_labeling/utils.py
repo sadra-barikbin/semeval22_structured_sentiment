@@ -167,13 +167,18 @@ class Split(object):
     def pack_words(self, ws):
         return pack_sequence(ws)
 
-    def collate_fn(self, batch):
+    def collate_fn(self, batch, device='cuda'):
         sorted_batch = sorted(batch, key=lambda x: len(x[1]), reverse=True)
         sequences = [w for _, w, _ in sorted_batch]
-        sequences_padded = torch.nn.utils.rnn.pad_sequence(sequences, batch_first=True, padding_value=0)
+        sequences_padded = torch.nn.utils.rnn.pad_sequence(
+            sequences, batch_first=True, padding_value=0).to(device)
         # This is later needed in order to unpad the sequences
-        lengths = torch.LongTensor([len(x) for x in sequences])
-        labels = torch.nn.utils.rnn.pad_sequence(list(map(lambda x: x[2], sorted_batch)), batch_first=True, padding_value=0)
+        lengths = torch.LongTensor([len(x) for x in sequences]).to(device)
+        labels = torch.nn.utils.rnn.pad_sequence(
+            list(map(lambda x: x[2], sorted_batch)),
+            batch_first=True,
+            padding_value=0
+        ).to(device)
         sent_ids = list(map(lambda x: x[0], sorted_batch))
         return sent_ids, sequences_padded, lengths, labels
 

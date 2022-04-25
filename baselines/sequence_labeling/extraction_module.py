@@ -5,6 +5,7 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence, Packed
 from torch.utils.data import DataLoader
 
 from itertools import chain
+from functools import partial
 import numpy as np
 from sklearn.metrics import accuracy_score, f1_score
 from WordVecs import WordVecs
@@ -139,7 +140,7 @@ class Bilstm(nn.Module):
         for sent_id, seq, lengths, labels in test_data:
             preds = self.forward(seq, lengths)
             preds = preds.argmax(2)
-            for pred, length, label in zip(preds, lengths, labels):
+            for pred, length, label in zip(preds.cpu().numpy(), lengths.cpu().numpy(), labels.cpu().numpy()):
                 pred = pred[:length]
                 label = label[:length]
                 final_preds.extend(pred)
@@ -163,6 +164,7 @@ if __name__ == "__main__":
     parser.add_argument("--OUTDIR", "-odir", default="saved_models")
     parser.add_argument("--ANNOTATION", "-ann", default="expressions", help="which ")
     parser.add_argument("--save_all", action="store_true", help="if true, saves all models, otherwise, saves only best model")
+    parser.add_argument("--DEVICE", "-device", default='cpu')
 
     args = parser.parse_args()
     print(args)
@@ -216,14 +218,16 @@ if __name__ == "__main__":
     tag2idx = label2idx.label2idx[annotation]
     num_labels = len(set(tag2idx.values()))
 
+    collate_fn = partial(source_train.collate_fn, device=args.DEVICE)
+
     train_loader = DataLoader(source_train,
                               batch_size=args.BATCH_SIZE,
-                              collate_fn=source_train.collate_fn,
+                              collate_fn=collate_fn,
                               shuffle=True)
 
     dev_loader = DataLoader(source_dev,
                             batch_size=args.BATCH_SIZE,
-                            collate_fn=source_train.collate_fn,
+                            collate_fn=collate_fn,
                             shuffle=False)
 
     diff = len(vocab) - embeddings.vocab_length - 1
@@ -258,11 +262,12 @@ if __name__ == "__main__":
                    embedding_dim,
                    args.HIDDEN_DIM,
                    args.NUM_LAYERS,
-                   train_embeddings=args.TRAIN_EMBEDDINGS)
+                   train_embeddings=args.TRAIN_EMBEDDINGS).to(args.DEVICE)
 
     model.fit(train_loader, dev_loader, epochs=10)
     f1, params, best_weights = get_best_run(basedir)
     model.load_state_dict(torch.load(best_weights))
+    model.to(args.DEVICE)
     model.eval()
 
     model.score(dev_loader)
