@@ -118,14 +118,14 @@ class RelationSplit(object):
     def pack_words(self, ws):
         return pack_padded_sequence(ws)
 
-    def collate_fn(self, batch):
+    def collate_fn(self, batch, device='cuda'):
         batch = sorted(batch, key=lambda item: len(item[1]), reverse=True)
 
         sent_ids = [sent_id for sent_id, w, e1, e2, label in batch]
-        words = pack_sequence([w for sent_id, w, e1, e2, label in batch])
-        e1s = pack_sequence([e1 for sent_id, w, e1, e2, label in batch])
-        e2s = pack_sequence([e2 for sent_id, w, e1, e2, label in batch])
-        targets = default_collate([t for sent_id, w, e1, e2, t in batch])
+        words = pack_sequence([w.to(device) for sent_id, w, e1, e2, label in batch])
+        e1s = pack_sequence([e1.to(device) for sent_id, w, e1, e2, label in batch])
+        e2s = pack_sequence([e2.to(device) for sent_id, w, e1, e2, label in batch])
+        targets = default_collate([t.to(device) for sent_id, w, e1, e2, t in batch])
 
         return sent_ids, words, e1s, e2s, targets
 
