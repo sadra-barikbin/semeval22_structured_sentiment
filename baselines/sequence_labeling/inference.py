@@ -1,7 +1,7 @@
 import torch
 from torch.nn.utils.rnn import pack_sequence
 from torch.utils.data import DataLoader
-
+from functools import partial
 
 import numpy as np
 import argparse
@@ -53,11 +53,13 @@ def extract_spans(model_dir, datafile, args):
                                                       annotation=annotation
                                                       )
 
+        collate_fn = partial(inference_data.collate_fn, device=args.DEVICE)
+
         tag2idx = label2idx.label2idx[annotation]
 
         dev_loader = DataLoader(inference_data,
                                 batch_size=args.BATCH_SIZE,
-                                collate_fn=inference_data.collate_fn,
+                                collate_fn=collate_fn,
                                 shuffle=False)
 
         new_matrix = np.zeros(matrix_shape)
@@ -74,7 +76,7 @@ def extract_spans(model_dir, datafile, args):
         f1, params, best_weights = get_best_run(basedir)
         model.load_state_dict(torch.load(best_weights))
         model.eval()
-
+        model.to(args.DEVICE)
         sent_ids, pred = model.predict(dev_loader)
         predictions[annotation] = pred
     return sent_ids, predictions, label2idx
@@ -200,6 +202,7 @@ def main():
     parser.add_argument("--DATADIR", "-data", default="opener_en")
     parser.add_argument("--FILE", "-file", default="dev.json")
     parser.add_argument("--BATCH_SIZE", "-bs", default=50, type=int)
+    parser.add_argument("--DEVICE", "-device", default='cpu')
 
     args = parser.parse_args()
     print(args)

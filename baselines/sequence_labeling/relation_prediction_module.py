@@ -73,10 +73,13 @@ class Relation_Model(nn.Module):
         self.word_dropout = nn.Dropout(word_dropout)
         self.ff = nn.Linear(hidden_dim * 6, 1)
 
-    def init_hidden1(self, batch_size=1):
-        h0 = torch.zeros((self.sent_lstm.num_layers*(1+self.sent_lstm.bidirectional),
-                                  batch_size, self.sent_lstm.hidden_size))
-        c0 = torch.zeros_like(h0)
+    def init_hidden1(self, batch_size=1, device='cuda'):
+        h0 = torch.zeros(
+          (self.sent_lstm.num_layers*(1+self.sent_lstm.bidirectional),
+          batch_size,
+          self.sent_lstm.hidden_size),
+        ).to(device)
+        c0 = torch.zeros_like(h0).to(device)
         return (h0, c0)
 
     def forward(self, sent, e1, e2, batch_sizes):
@@ -84,7 +87,7 @@ class Relation_Model(nn.Module):
         emb = self.word_embeds(sent.data)
         emb = self.word_dropout(emb)
         packed_emb = PackedSequence(emb, batch_sizes)
-        self.hidden = self.init_hidden1(batch_size)
+        self.hidden = self.init_hidden1(batch_size, emb[0].device)
         output, (hn, cn) = self.sent_lstm(packed_emb, self.hidden)
         #text_rep = hn.reshape(batch_size, self.hidden_dim * 2)
         o, _ = pad_packed_sequence(output, batch_first=True)
@@ -95,7 +98,7 @@ class Relation_Model(nn.Module):
 
         emb = self.e1_embeds(e1.data)
         packed_emb = PackedSequence(emb, batch_sizes)
-        self.hidden = self.init_hidden1(batch_size)
+        self.hidden = self.init_hidden1(batch_size, emb[0].device)
         output, (hn, cn) = self.e1_lstm(packed_emb, self.hidden)
         #e1_rep = hn.reshape(batch_size, self.hidden_dim * 2)
         o, _ = pad_packed_sequence(output, batch_first=True)
@@ -106,7 +109,7 @@ class Relation_Model(nn.Module):
 
         emb = self.e2_embeds(e2.data)
         packed_emb = PackedSequence(emb, batch_sizes)
-        self.hidden = self.init_hidden1(batch_size)
+        self.hidden = self.init_hidden1(batch_size, emb[0].device)
         output, (hn, cn) = self.e2_lstm(packed_emb, self.hidden)
         #e2_rep = hn.reshape(batch_size, self.hidden_dim * 2)
         o, _ = pad_packed_sequence(output, batch_first=True)
@@ -194,7 +197,7 @@ class Relation_Model(nn.Module):
             batches += 1
             batch_sizes = sent.batch_sizes
             pred = self.forward(sent, e1, e2, batch_sizes)
-            preds.extend(pred.cpu().numpy())
+            preds.extend(pred.detach().cpu().numpy())
             golds.extend(label.cpu().numpy())
             loss = self.criterion(pred, label.float())
             batch_loss += loss.data
