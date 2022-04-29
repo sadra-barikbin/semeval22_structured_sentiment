@@ -119,9 +119,9 @@ def predict_relations(model_dir, datafile, predictions, sent_ids, label2idx, arg
         offset_dict = get_offsets(text)
         seq = pack_sequence(torch.LongTensor(rel_vocab.ws2ids(text.split())).unsqueeze(0))
         #seq = pack_sequence(inference_data[i][1].unsqueeze(0))
-        sources = break_up_predictions(predictions["sources"][i].numpy())
-        targets = break_up_predictions(predictions["targets"][i].numpy())
-        expressions, polarities = break_up_expressions(predictions["expressions"][i].numpy(), label2idx)
+        sources = break_up_predictions(predictions["sources"][i].detach().cpu().numpy())
+        targets = break_up_predictions(predictions["targets"][i].detach().cpu().numpy())
+        expressions, polarities = break_up_expressions(predictions["expressions"][i].detach().cpu().numpy(), label2idx)
 
         for expression, polarity in zip(expressions, polarities):
             added_to_opinions = False
