@@ -118,7 +118,7 @@ class MyDataset(Dataset):
 
         if self.use_elmo:
             felmo.close()
-        print("Done")
+        print("Loading data: Done")
         #return data
 
     def __len__(self):
@@ -160,7 +160,7 @@ class Glove(vcb.Vocab):
                 vector = [float(v) for v in line[1:]]
                 self.add(word)
                 glove.append(vector)
-        print("Done")
+        print("Loading glove vectors: Done")
 
         self.dim = len(glove[0])
 

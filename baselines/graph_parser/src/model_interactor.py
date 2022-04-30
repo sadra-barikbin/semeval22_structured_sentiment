@@ -278,7 +278,7 @@ class ModelInteractor:
                 other_predictions.update(other_pred)
         #for k,v in predictions.items():
         #    print(k, v.shape)
-        print("Done")
+        print("Predicting data: Done")
 
         #return self.test_data.data, predictions
         return self.test_data, predictions, other_predictions
