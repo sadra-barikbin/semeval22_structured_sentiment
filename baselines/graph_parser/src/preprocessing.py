@@ -185,8 +185,8 @@ class External(vcb.Vocab):
         print("Loading External Vectors")
         if iszip:
             with zipfile.ZipFile(fname, "r") as archive:
-                stream = archive.open("model.bin")
-                model = gensim.models.KeyedVectors.load_word2vec_format(stream, binary=True, unicode_errors="replace")
+                full_name=archive.extract("model.bin")
+                model = gensim.models.KeyedVectors.load_word2vec_format(full_name, binary=True, unicode_errors="replace")
         else:
             if fname.endswith(".robin"):
                 model = gensim.models.KeyedVectors.load(fname)
