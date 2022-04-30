@@ -37,8 +37,8 @@ class WordVecs(object):
         elif file.endswith(".zip"):
             import zipfile
             with zipfile.ZipFile(file, "r") as archive:
-                stream = archive.open("model.bin")
-                model = gensim.models.KeyedVectors.load_word2vec_format(stream, binary=True, unicode_errors="replace")
+                full_name=archive.extract("model.bin")
+                model = gensim.models.KeyedVectors.load_word2vec_format(full_name, binary=True, unicode_errors="replace")
         vocab_length, vec_dim = model.vectors.shape
         emb_matrix = model.vectors
         w2idx = dict([(w, i.index) for w, i in model.vocab.items()])
