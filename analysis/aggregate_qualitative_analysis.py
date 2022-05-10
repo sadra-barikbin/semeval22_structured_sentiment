@@ -96,7 +96,7 @@ def analysis(funct):
             if stp == "crosslingual" and corpus not in crosslingual_corpora:
                 continue
 
-            goldfile = os.path.join(gold_path, corpus+ "/test_labeled.json")
+            goldfile = os.path.join(gold_path, corpus+ "/test.json")
             gold_keys, gold = open_json(goldfile)
             pred_dict = corpus_predictions(corpus,submission_path,stp)
 

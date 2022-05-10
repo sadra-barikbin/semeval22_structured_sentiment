@@ -22,7 +22,7 @@ do
         for dataset in $SUB_BASE/"$TEAM"/"$CATEGORY"/*
         do
             DATASET=$(basename "$dataset")
-            python3 overlap_analysis.py "$GOLD_BASE/$DATASET/test_labeled.json" "$dataset/predictions.json" >>assembled_overlap.json
+            python3 overlap_analysis.py "$GOLD_BASE/$DATASET/test.json" "$dataset/predictions.json" >>assembled_overlap.json
         done
     done
 done
