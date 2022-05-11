@@ -87,7 +87,7 @@ for dataset, monomulti in data:
     plt.clf()
 
 with open("outliers.txt", "w") as f:
-    for setting in ("monolingual", "crosslingual"):
+    for setting in ("monolingual",):
         print("Boxing", setting)
         df = pd.DataFrame(item for (_ds, monomulti), items in data.items() for item in items if monomulti == setting)
         f.write(f"Setting: {setting}\n")
