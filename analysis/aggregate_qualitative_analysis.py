@@ -117,7 +117,7 @@ def main():
     global setups
     global crosslingual_corpora
     setups = [
-        "crosslingual",
+        # "crosslingual",
         "monolingual"
         ]
 

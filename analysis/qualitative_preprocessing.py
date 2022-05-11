@@ -17,7 +17,7 @@ def corpus_predictions(corpus,predictions_path,setup):
     # iterate through teams
     for s in os.listdir(predictions_path):
         current_path = os.path.join(predictions_path, s+"/"+setup)
-        if "sadra-barikbin" in s and setup=="crosslingual":
+        if "sadra-barikbin" in s and setup == "crosslingual":
                 continue
 
         pred_file = os.path.join(current_path, corpus+"/predictions.json")
