@@ -133,8 +133,8 @@ def main():
     gold_path = args.gold
     submission_path = args.predictions
 
-    clean_directory(args.predictions)
-    unzip_submissions(args.predictions)
+    # clean_directory(args.predictions)
+    # unzip_submissions(args.predictions)
 
     analysis("holder_target")
     analysis("exact_holder_target")
@@ -146,7 +146,7 @@ def main():
     analysis("opinion_sparsity")
     analysis("all_opinion_match_sparsity")
 
-    clean_directory(args.predictions)
+    # clean_directory(args.predictions)
                 
 
 

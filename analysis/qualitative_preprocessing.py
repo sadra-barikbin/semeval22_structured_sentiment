@@ -17,18 +17,16 @@ def corpus_predictions(corpus,predictions_path,setup):
     # iterate through teams
     for s in os.listdir(predictions_path):
         current_path = os.path.join(predictions_path, s+"/"+setup)
-        if "ohhhmygosh" in s and setup=="crosslingual":
+        if "sadra-barikbin" in s and setup=="crosslingual":
                 continue
 
-        if "submission" in s and not s.endswith(".zip"):
+        pred_file = os.path.join(current_path, corpus+"/predictions.json")
+        pred_keys, pred = open_json(pred_file)
+        check_predicted = [pred[key]["opinions"] for key in pred_keys if len(pred[key]["opinions"])!=0]
 
-            pred_file = os.path.join(current_path, corpus+"/predictions.json")
-            pred_keys, pred = open_json(pred_file)
-            check_predicted = [pred[key]["opinions"] for key in pred_keys if len(pred[key]["opinions"])!=0]
+        if len(check_predicted) != 0:
 
-            if len(check_predicted) != 0:
-
-                mydict[s]= pred
+            mydict[s]= pred
 
     return mydict
 
