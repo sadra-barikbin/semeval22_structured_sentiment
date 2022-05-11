@@ -1,6 +1,6 @@
 #!/bin/bash
 # Set some random seeds that will be the same for all experiments
-SEEDS=(17181920)
+SEEDS=(41 666 1567 4447 37773)
 
 # Setup directories
 mkdir logs
@@ -35,17 +35,18 @@ for DATASET in darmstadt_unis mpqa multibooked_ca multibooked_eu norec opener_es
     # Currently, just use head_final, but you can use others
     for SETUP in head_final; do
         mkdir experiments/$DATASET/$SETUP;
-        echo "Running $DATASET - $SETUP"
-        SEED=${SEEDS[0]}
-        OUTDIR=experiments/$DATASET/$SETUP;
-        mkdir experiments/$DATASET/$SETUP;
-        # If a model is already trained, don't retrain
-        if [ -f "$OUTDIR"/test.conllu.pred ]; then
-            echo "$DATASET-$SETUP already trained"
-        else
-            mkdir logs/$DATASET/$SETUP;
-            LOGFILE=logs/$DATASET/$SETUP/log.txt
-            bash ./sentgraph.sh  $DATASET $SETUP $SEED > $LOGFILE
-        fi
+        for SEED in ${SEEDS[@]}; do
+            echo "Running $DATASET - $SETUP - $SEED"
+            mkdir experiments/$DATASET/$SETUP/$SEED;
+            OUTDIR=experiments/$DATASET/$SETUP/$SEED;
+            mkdir experiments/$DATASET/$SETUP/$SEED;
+            # If a model is already trained, don't retrain
+            if [ -f "$OUTDIR"/test.conllu.pred ]; then
+                echo "$DATASET-$SETUP-$SEED already trained"
+            else
+                mkdir logs/$DATASET/$SETUP/$SEED;
+                LOGFILE=logs/$DATASET/$SETUP/$SEED/log.txt
+                bash ./sentgraph.sh  $DATASET $SETUP $SEED > $LOGFILE
+            fi
     done;
 done;
