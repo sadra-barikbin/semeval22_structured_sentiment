@@ -47,5 +47,6 @@ for DATASET in darmstadt_unis mpqa multibooked_ca multibooked_eu norec opener_es
                 LOGFILE=logs/$DATASET/$SETUP/$SEED/log.txt
                 bash ./sentgraph.sh  $DATASET $SETUP $SEED > $LOGFILE
             fi
+        done;
     done;
 done;
