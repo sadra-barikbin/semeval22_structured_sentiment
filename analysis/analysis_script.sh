@@ -10,16 +10,20 @@ fi
 PREDFILE=$1
 
 # domain analysis
+echo "Domain Analysis on Norec:"
 python3 domain_analysis.py ../data/norec/test.json $PREDFILE metadata.json
 
 # negation analysis
+echo "Negation Analysis on Norec:"
 python3 neg_scope_analysis.py ../data/norec/test.json $PREDFILE negation_test.json
 
 # overlap analysis
+echo "Overlap Analysis:"
 ./assemble_overlap_data.sh
 python3  plot_overlaps.py
 
 # qualitative analysis
+echo "Qualitative Analysis:"
 GOLDPATH=$2 # location of gold test data
 PREDPATH=$3 # location of teams submissions
 python3 aggregate_qualitative_analysis.py $GOLDPATH $PREDPATH
