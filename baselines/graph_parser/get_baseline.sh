@@ -36,14 +36,14 @@ for DATASET in darmstadt_unis mpqa multibooked_ca multibooked_eu norec opener_es
     for SETUP in head_final; do
         mkdir experiments/$DATASET/$SETUP;
         for SEED in ${SEEDS[@]}; do
-            echo "Running $DATASET - $SETUP - $"
+            echo "Running $DATASET - $SETUP - $SEED"
             mkdir experiments/$DATASET/$SETUP/$SEED;
             OUTDIR=experiments/$DATASET/$SETUP/$SEED;
             # If a model is already trained, don't retrain
             if [ -f "$OUTDIR"/test.conllu.pred ]; then
                 echo "$DATASET-$SETUP-$SEED already trained"
             else
-                mkdir logs/$DATASET/$SETUP/$SEED;
+                mkdir -p logs/$DATASET/$SETUP/$SEED;
                 LOGFILE=logs/$DATASET/$SETUP/$SEED/log.txt
                 bash ./sentgraph.sh  $DATASET $SETUP $SEED > $LOGFILE
             fi
