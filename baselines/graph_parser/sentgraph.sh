@@ -57,7 +57,7 @@ echo "###########################"
 echo OUTPUT DIR
 echo "###########################"
 
-DIR=experiments/$DATASET/$SETUP
+DIR=experiments/$DATASET/$SETUP/$SEED
 echo saving experiment to $DIR
 
 pwd
