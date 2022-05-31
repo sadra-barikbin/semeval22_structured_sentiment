@@ -392,7 +392,10 @@ def convert_col_sent_to_json(col_sent):
     for token in col_sent.tokens:
         j = i + len(token.form)
         token.char_offsets = (i, j)
-        # assert col_sent.text[i:j] == token.form
+        try:
+            assert col_sent.text[i:j] == token.form
+        except:
+            print(f"bad col_sent : {col_sent.text}")
         i = j + 1
 
     # find all roots, i.e. 0:exp-(Positive|Neutral|Negative)
